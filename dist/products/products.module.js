@@ -9,11 +9,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductsModule = void 0;
 const common_1 = require("@nestjs/common");
 const products_controller_1 = require("./products.controller");
+const microservices_1 = require("@nestjs/microservices");
+const config_1 = require("../config");
 let ProductsModule = class ProductsModule {
 };
 exports.ProductsModule = ProductsModule;
 exports.ProductsModule = ProductsModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            microservices_1.ClientsModule.register([
+                {
+                    name: config_1.PRODUCT_SERVICE,
+                    transport: microservices_1.Transport.TCP,
+                    options: {
+                        host: config_1.envs.productsMicroserviceHost,
+                        port: config_1.envs.productsMicroservicePort
+                    }
+                },
+            ]),
+        ],
         controllers: [products_controller_1.ProductsController],
         providers: [],
     })

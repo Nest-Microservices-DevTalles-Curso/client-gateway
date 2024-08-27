@@ -14,36 +14,54 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductsController = void 0;
 const common_1 = require("@nestjs/common");
+const microservices_1 = require("@nestjs/microservices");
+const rxjs_1 = require("rxjs");
+const common_2 = require("../common");
+const config_1 = require("../config");
+const create_product_dto_1 = require("./dto/create-product.dto");
+const update_product_dto_1 = require("./dto/update-product.dto");
 let ProductsController = class ProductsController {
-    constructor() {
+    constructor(productsClient) {
+        this.productsClient = productsClient;
     }
-    createProduct() {
-        return 'Crea producto';
+    createProduct(createProductDto) {
+        return this.productsClient.send({ cmd: 'create_product' }, createProductDto);
     }
-    findAllProducts() {
-        return 'Todos los productos';
+    findAllProducts(paginationDto) {
+        return this.productsClient.send({ cmd: 'find_all_products' }, paginationDto);
     }
-    findOneProduct(id) {
-        return 'Un solo producto: ' + id;
+    async findOneProduct(id) {
+        return this.productsClient.send({ cmd: 'find_one_product' }, { id })
+            .pipe((0, rxjs_1.catchError)((err) => {
+            throw new microservices_1.RpcException(err.message);
+        }));
     }
-    patchProduct(id, body) {
-        return 'Actualiza producto: ' + id;
+    async patchProduct(id, body) {
+        return this.productsClient.send({ cmd: 'update_product' }, { id, ...body })
+            .pipe((0, rxjs_1.catchError)((err) => {
+            throw new microservices_1.RpcException(err);
+        }));
     }
     deleteProduct(id) {
-        return 'Elimina producto: ' + id;
+        return this.productsClient.send({ cmd: 'delete_product' }, { id })
+            .pipe((0, rxjs_1.catchError)((err) => {
+            throw new microservices_1.RpcException(err.message);
+        }));
     }
 };
 exports.ProductsController = ProductsController;
 __decorate([
     (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [create_product_dto_1.CreateProductDto]),
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "createProduct", null);
 __decorate([
     (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [common_2.PaginationDto]),
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "findAllProducts", null);
 __decorate([
@@ -51,25 +69,26 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "findOneProduct", null);
 __decorate([
     (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [Number, update_product_dto_1.UpdateProductDto]),
+    __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "patchProduct", null);
 __decorate([
     (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "deleteProduct", null);
 exports.ProductsController = ProductsController = __decorate([
     (0, common_1.Controller)('products'),
-    __metadata("design:paramtypes", [])
+    __param(0, (0, common_1.Inject)(config_1.PRODUCT_SERVICE)),
+    __metadata("design:paramtypes", [microservices_1.ClientProxy])
 ], ProductsController);
 //# sourceMappingURL=products.controller.js.map
