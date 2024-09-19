@@ -21,29 +21,29 @@ const config_1 = require("../config");
 const create_product_dto_1 = require("./dto/create-product.dto");
 const update_product_dto_1 = require("./dto/update-product.dto");
 let ProductsController = class ProductsController {
-    constructor(productsClient) {
-        this.productsClient = productsClient;
+    constructor(client) {
+        this.client = client;
     }
     createProduct(createProductDto) {
-        return this.productsClient.send({ cmd: 'create_product' }, createProductDto);
+        return this.client.send({ cmd: 'create_product' }, createProductDto);
     }
     findAllProducts(paginationDto) {
-        return this.productsClient.send({ cmd: 'find_all_products' }, paginationDto);
+        return this.client.send({ cmd: 'find_all_products' }, paginationDto);
     }
     async findOneProduct(id) {
-        return this.productsClient.send({ cmd: 'find_one_product' }, { id })
+        return this.client.send({ cmd: 'find_one_product' }, { id })
             .pipe((0, rxjs_1.catchError)((err) => {
             throw new microservices_1.RpcException(err.message);
         }));
     }
     async patchProduct(id, body) {
-        return this.productsClient.send({ cmd: 'update_product' }, { id, ...body })
+        return this.client.send({ cmd: 'update_product' }, { id, ...body })
             .pipe((0, rxjs_1.catchError)((err) => {
             throw new microservices_1.RpcException(err);
         }));
     }
     deleteProduct(id) {
-        return this.productsClient.send({ cmd: 'delete_product' }, { id })
+        return this.client.send({ cmd: 'delete_product' }, { id })
             .pipe((0, rxjs_1.catchError)((err) => {
             throw new microservices_1.RpcException(err.message);
         }));
@@ -88,7 +88,7 @@ __decorate([
 ], ProductsController.prototype, "deleteProduct", null);
 exports.ProductsController = ProductsController = __decorate([
     (0, common_1.Controller)('products'),
-    __param(0, (0, common_1.Inject)(config_1.PRODUCT_SERVICE)),
+    __param(0, (0, common_1.Inject)(config_1.NATS_SERVICE)),
     __metadata("design:paramtypes", [microservices_1.ClientProxy])
 ], ProductsController);
 //# sourceMappingURL=products.controller.js.map
